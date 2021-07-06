@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response 
+from .serializers import FeedSerializer, ArticleSerializer
 from .services import subscribe_to_feed, mark_article_read
 from .models import Feed, Article
-from .serializers import FeedSerializer, ArticleSerializer
+
 
 
 class FeedViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,7 +23,13 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
     def unsubscribe(self, request, pk=None):
         """Feed endpoint to unsubscribe the user from the feed"""
         return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
-        
+    
+    @action(methods=['get'], detail=True, url_path='update-articles')
+    def update_articles(self, request, pk=None):
+        """Feed endpoint to load new articles"""
+        new_articles = Feed.objects.update_feed_content(self.get_object())
+        return Response({'message':'Succesfully updated', 'new_enries' :ArticleSerializer(new_articles, many=True).data})
+
 
 
 

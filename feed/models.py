@@ -21,17 +21,20 @@ class FeedManager(models.Manager):
         return feed_obj
     
     def update_feed_content(self, feed, articles=None):
-        """Adds new articles for the provided feed"""
+        """Adds new articles for the provided feed and returns new articles"""
 
         # Parse the articles if they are not provided
         if articles is None:
             import feedparser
             articles = feedparser.parse(feed.link)['entries']
         
-        # Create new articles if do not exist
+        articles_obj = []
         for article in articles:
-            Article.objects.get_or_create(title=article['title'], feed=feed)
-
+            # Create new articles if do not exist
+            article_obj, created = Article.objects.get_or_create(title=article['title'], feed=feed)
+            if created:
+                articles_obj.append(article_obj)
+        return articles_obj # Return new articles
 
 
 class Feed(models.Model):

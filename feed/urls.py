@@ -23,7 +23,7 @@ urlpatterns = [
 
     # /feeds/<id>/articles
     # /feeds/<id>/articles/<id>
-    path('', include(feeds_router.urls)),
+    path('', include(feeds_articles_router.urls)),
 
     # /my-feeds
     # /my-feeds/<id>
