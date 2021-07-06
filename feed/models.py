@@ -1,5 +1,7 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.expressions import Value
+
 
 
 class FeedManager(models.Manager):
@@ -13,7 +15,7 @@ class FeedManager(models.Manager):
         if feed['entries'] == []:
             raise ValueError('The provided link does not have any rss entries')
 
-        feed_obj = self.create(name=feed['feed']['title'], link=link)
+        feed_obj = self.create(title=feed['feed']['title'], subtitle=feed['feed']['subtitle'], link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
 
         return feed_obj
@@ -35,13 +37,15 @@ class FeedManager(models.Manager):
 class Feed(models.Model):
     """Feed os a collection of Articles from one source coming from link"""
 
-    name = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=100, unique=True)
+    subtitle = models.CharField(max_length=150, default='No subtitle')
     link = models.URLField(max_length=200, unique=True)
+    subscribers = models.ManyToManyField(User, blank=True)
 
     objects = FeedManager()
 
     def __str__(self):
-        return self.name
+        return self.title
 
 class Article(models.Model):
     """Article is a peace of news from a feed"""
