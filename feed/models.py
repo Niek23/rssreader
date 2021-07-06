@@ -52,6 +52,7 @@ class Article(models.Model):
 
     title = models.CharField(max_length=200, unique=True)
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
+    is_read_by = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.title

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response 
+from .services import subscribe_to_feed, mark_article_read
 from .models import Feed, Article
 from .serializers import FeedSerializer, ArticleSerializer
 
@@ -15,30 +16,15 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=True, url_path='subscribe')
     def subscribe(self, request, pk=None):
         """Feed endpoint to subscribe the user to the feed"""
-        
-        feed = self.get_object()
-        user = request.user
-
-        # Check if the user is already subcribed to the feed
-        if feed.subscribers.filter(pk = user.id).exists():
-            return Response({'message':'You are already subscribed to this feed'})
-
-        feed.subscribers.add(user)
-        return Response({'message': f'You have successfully subscribed to {feed} feed'})
+        return subscribe_to_feed(request.user, self.get_object())
 
     @action(methods=['get'], detail=True, url_path='unsubscribe')
     def unsubscribe(self, request, pk=None):
         """Feed endpoint to unsubscribe the user from the feed"""
+        return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
+        
 
-        feed = self.get_object()
-        user = request.user
 
-        # Check if the user is not subcribed to the feed
-        if not feed.subscribers.filter(pk = user.id).exists():
-            return Response({'message':'You are not subscribed to this feed'})
-
-        feed.subscribers.remove(user)
-        return Response({'message': f'You have successfully unsubscribed from {feed} feed'})
 
 class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
@@ -47,6 +33,17 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Article.objects.filter(feed=self.kwargs['feed_pk'])
     serializer_class = ArticleSerializer
+
+    @action(methods=['get'], detail=True, url_path='mark-read')
+    def mark_read(self, request, pk=None, feed_pk=None):
+        """Endpoint to mark an article as read"""
+        return mark_article_read(request.user, self.get_object())
+    
+    @action(methods=['get'], detail=True, url_path='unmark-read')
+    def unmark_read(self, request, pk=None, feed_pk=None):
+        """Endpoint to unmark an article as read"""
+        return mark_article_read(request.user, self.get_object(), mark=False)
+
 
 
 class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
