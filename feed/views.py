@@ -1,4 +1,6 @@
+from urllib import request
 from django.contrib.auth.models import User
+from django.utils import decorators
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response 
@@ -31,16 +33,31 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({'message':'Succesfully updated', 'new_enries' :ArticleSerializer(new_articles, many=True).data})
 
 
+class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
+    """ Feeds endpoint to get a list of feeds a user subcribed to"""
+
+    queryset = Feed.objects.all()
+    def get_queryset(self):                                    
+        return super().get_queryset().filter(subscribers__id=self.request.user.id)
+    serializer_class = FeedSerializer
+
+
 
 
 class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
 
-    # Get articles for only selected feed
-    def get_queryset(self):
-        return Article.objects.filter(feed=self.kwargs['feed_pk'])
+    queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-
+    
+    def get_queryset(self):
+        read = self.request.query_params.get('read')
+        if read is not None:
+            if read == 'true':
+                return super().get_queryset().filter(is_read_by__id=self.request.user.id)
+            elif read == 'false':
+                return super().get_queryset().exclude(is_read_by__id=self.request.user.id)
+        return super().get_queryset()
     @action(methods=['get'], detail=True, url_path='mark-read')
     def mark_read(self, request, pk=None, feed_pk=None):
         """Endpoint to mark an article as read"""
@@ -51,13 +68,13 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
         """Endpoint to unmark an article as read"""
         return mark_article_read(request.user, self.get_object(), mark=False)
 
+class NestedArticleViewSet(ArticleViewSet):
+    """  """
+    # Get articles for only selected feed
+    def get_queryset(self):
+        return super().get_queryset().filter(feed=self.kwargs['feed_pk'])
+    serializer_class = ArticleSerializer
 
 
-class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
-    """ Feeds endpoint to get a list of feeds a user subcribed to"""
 
-    queryset = Feed.objects.all()
-    def get_queryset(self):                                    
-        return super().get_queryset().filter(subscribers__id=self.request.user.id)
-    serializer_class = FeedSerializer
 

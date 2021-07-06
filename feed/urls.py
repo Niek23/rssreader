@@ -1,37 +1,37 @@
-from .views import FeedViewSet, ArticleViewSet, MyFeedViewSet
+from .views import FeedViewSet, ArticleViewSet, MyFeedViewSet, NestedArticleViewSet
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 
-feeds_router = DefaultRouter()
-myfeeds_router = DefaultRouter()
+router = DefaultRouter()
 
-feeds_router.register(r'feeds', FeedViewSet)
-myfeeds_router.register(r'my-feeds', MyFeedViewSet)
+router.register(r'feeds', FeedViewSet)
+router.register(r'my-feeds', MyFeedViewSet)
+router.register(r'articles', ArticleViewSet)
 
-feeds_articles_router = routers.NestedSimpleRouter(feeds_router, r'feeds', lookup='feed')
-myfeeds_articles_router = routers.NestedSimpleRouter(myfeeds_router, r'my-feeds', lookup='feed')
+feeds_articles_router = routers.NestedSimpleRouter(router, r'feeds', lookup='feed')
+myfeeds_articles_router = routers.NestedSimpleRouter(router, r'my-feeds', lookup='feed')
 
-feeds_articles_router.register(r'articles', ArticleViewSet, basename='feed-article')
-myfeeds_articles_router.register(r'articles', ArticleViewSet, basename='myfeed-article')
+feeds_articles_router.register(r'articles', NestedArticleViewSet, basename='feed-article')
+myfeeds_articles_router.register(r'articles', NestedArticleViewSet, basename='myfeed-article')
 
 urlpatterns = [
-
-    # /feeds
-    # /feeds/<id>
-    path('', include(feeds_router.urls)),
 
     # /feeds/<id>/articles
     # /feeds/<id>/articles/<id>
     path('', include(feeds_articles_router.urls)),
 
+    # /my-feeds/<id>/articles
+    # /my-feeds/<id>/articles/<id>
+    path('', include(myfeeds_articles_router.urls)),
+
+    # /feeds
+    # /feeds/<id>
     # /my-feeds
     # /my-feeds/<id>
-    path('', include(myfeeds_router.urls)),
-
-    # /my-feeds/<id>/articles
-    # /feeds/<id>/articles/<id>
-    path('', include(myfeeds_articles_router.urls)),
+    # /articles
+    # /articles/<id>
+    path('', include(router.urls))
 
 
 ] 
