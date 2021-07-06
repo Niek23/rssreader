@@ -1,4 +1,3 @@
-import re
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -29,7 +28,7 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(methods=['get'], detail=True, url_path='unsubscribe')
     def unsubscribe(self, request, pk=None):
-        """Feed endpoint to unsubscribe the user to the feed"""
+        """Feed endpoint to unsubscribe the user from the feed"""
 
         feed = self.get_object()
         user = request.user
@@ -48,4 +47,13 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Article.objects.filter(feed=self.kwargs['feed_pk'])
     serializer_class = ArticleSerializer
-    
+
+
+class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
+    """ Feeds endpoint to get a list of feeds a user subcribed to"""
+
+    queryset = Feed.objects.all()
+    def get_queryset(self):                                    
+        return super().get_queryset().filter(subscribers__id=self.request.user.id)
+    serializer_class = FeedSerializer
+
