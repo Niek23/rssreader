@@ -1,5 +1,4 @@
 import dramatiq
-
 from .models import Tasks
 
 
@@ -24,3 +23,4 @@ class JobMiddleware(dramatiq.middleware.Middleware):
         if exception is not None:
             status = "FAILURE"
         self.job_update_or_create(message, status)
+        

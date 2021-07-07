@@ -1,6 +1,6 @@
-import dramatiq 
-from .scheduler import cron
+import dramatiq
 from feed.models import Feed
+from .scheduler import cron
 
 
 @cron("* * * * *")

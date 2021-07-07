@@ -15,12 +15,10 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 
-
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     path(r'auth/', include('users.urls')),
     path(r'api/', include('feed.urls')),
-
 
     # Documentation
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
