@@ -1,0 +1,53 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks: 
+        - net1
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+    networks: 
+        - net1
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+        - ./data/rabbit_data:/var/lib/rabbit/data
+    ports:
+        - 5672:5672/tcp
+        - 15672:15672/tcp
+    restart: unless-stopped
+    networks:
+        - net1
+  worker:
+    build: .
+    command: python manage.py rundramatiq
+    depends_on: 
+        - rabbitmq
+        - app
+    networks: 
+        - net1
+  scheduler:
+    build: .
+    depends_on: 
+        - worker
+    command: python manage.py scheduler
+    networks: 
+        - net1
+    
+networks:
+    net1:
