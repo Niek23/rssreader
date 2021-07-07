@@ -3,38 +3,34 @@ from time import mktime
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import make_aware
-import feedparser
-from .services import is_valid_rss_feed
+from .services import get_valid_feed
 
 
 
 
 class FeedManager(models.Manager):
     def create_feed(self, link):
-        """Create a new feed from a link and updates this feed articles"""
+        """Create a new feed from a link and update this feed articles"""
 
-        feed = feedparser.parse(link)
-        is_valid_rss_feed(feed)
+        feed = get_valid_feed(link)
         feed_obj = self.create(title=feed['feed']['title'],
                                subtitle=feed['feed']['subtitle'],
                                link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
-
         return feed_obj
 
     def update_feed_content(self, feed, articles=None):
-        """Add new articles for the provided feed and return new articles"""
+        """Add new articles for the provided feed and return them"""
 
         # Parse the articles if they are not provided
         if articles is None:
-            parsed_feed = feedparser.parse(feed.link)
-            is_valid_rss_feed(parsed_feed)
+            parsed_feed = get_valid_feed(feed.link)
             articles = parsed_feed['entries']
 
         articles_obj = []
         for article in articles:
-            # Create new articles if do not exist
             dt_created = make_aware(datetime.fromtimestamp(mktime(article['published_parsed'])))
+            # Create new articles if does not exist
             article_obj, created = Article.objects.get_or_create(title=article['title'],
                                                                  feed=feed,
                                                                  created=dt_created)

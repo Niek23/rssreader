@@ -8,7 +8,8 @@ schema_view = get_schema_view(
    openapi.Info(
       title="RSS Reader API",
       default_version='v1',
-      description="Test description",
+      description="RSS Reader provides the possiblity to subscribe for various feeds,\
+                  mark articles and filter them.",
       contact=openapi.Contact(email="nkt.gonchar@gmail.com"),
    ),
    public=True,
