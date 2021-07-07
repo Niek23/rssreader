@@ -45,13 +45,16 @@ class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
 class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
 
-    queryset = Article.objects.all()
+    queryset = Article.objects.all().order_by('-created')
     serializer_class = ArticleSerializer
     
     def get_queryset(self):
         # Filter per feed and read/unread based on read paramenter in url
         read = self.request.query_params.get('read')
-        qs = super().get_queryset().filter(feed=self.kwargs['feed_pk'])
+        feed_pk = self.kwargs.get('feed_pk')
+        qs = super().get_queryset()
+        if feed_pk:
+            qs = super().get_queryset().filter(feed=self.kwargs['feed_pk'])
         return filter_read(qs, read, self.request)
         
     @action(methods=['get'], detail=True, url_path='mark-read')
