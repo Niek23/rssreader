@@ -1,8 +1,8 @@
-from rest_framework.response import Response 
+from rest_framework.response import Response
 
 def subscribe_to_feed(user, feed, subsrcibe=True):
     """(Un)Subscribe a user from/to feed and generate response"""
-    
+
     # Check if the user is already subcribed to the feed
     if subsrcibe:
         if feed.subscribers.filter(pk = user.id).exists():
@@ -10,7 +10,7 @@ def subscribe_to_feed(user, feed, subsrcibe=True):
 
         feed.subscribers.add(user)
         return Response({'message': f'You have successfully subscribed to * {feed} * feed'})
-     
+
     if not subsrcibe:
         if not feed.subscribers.filter(pk = user.id).exists():
             return Response({'message':f'You are not subscribed to * {feed} * feed'})
@@ -28,15 +28,15 @@ def mark_article_read(user, article, mark=True):
             return Response({'message':f'The article * {article} * is already marked READ'})
 
         article.is_read_by.add(user)
-        return Response({'message': f'You have successfully marked the article * {article} * READ'})
-    
+        return Response({'message': f'You have marked the article * {article} * READ'})
+
     if not mark:
         # Check if the article is not marked read
         if not article.is_read_by.filter(pk = user.id).exists():
             return Response({'message':f'The article * {article} * is already marked UNREAD'})
 
         article.is_read_by.remove(user)
-        return Response({'message': f'You have successfully marked the article * {article} * UNREAD'})
+        return Response({'message':f'You have marked the article * {article} * UNREAD'})
 
 def filter_read(query_set, read, request):
     """Check if read=(true/false) paramter is in url, filter and return queryset"""
@@ -44,14 +44,14 @@ def filter_read(query_set, read, request):
     if read is not None:
         if read == 'true':
             return query_set.filter(is_read_by__id=request.user.id)
-        elif read == 'false':
+        if read == 'false':
             return query_set.exclude(is_read_by__id=request.user.id)
-    return query_set    
+    return query_set
 
 def is_valid_rss_feed(feed):
     """Check is the provided feed is a valid"""
-    
+
     if feed['bozo'] == 1:
         raise ValueError('The provided link is not rss')
-    elif feed['bozo'] == True:
+    if feed['bozo'] is True:
         raise ValueError('The provided link is invalid or network problem occured')

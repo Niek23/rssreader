@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django_dramatiq',
     'rest_framework',
     'rest_framework.authtoken',
-    'users', 
+    'users',
     'feed',
     'djoser',
     'task_scheduler'
@@ -116,7 +116,7 @@ DATABASES = {
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'), 
+        'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
     }
 }
