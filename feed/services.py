@@ -40,9 +40,18 @@ def mark_article_read(user, article, mark=True):
 
 def filter_read(query_set, read, request):
     """Check if read=(true/false) paramter is in url, filter and return queryset"""
+
     if read is not None:
         if read == 'true':
             return query_set.filter(is_read_by__id=request.user.id)
         elif read == 'false':
             return query_set.exclude(is_read_by__id=request.user.id)
     return query_set    
+
+def is_valid_rss_feed(feed):
+    """Check is the provided feed is a valid"""
+    
+    if feed['bozo'] == 1:
+        raise ValueError('The provided link is not rss')
+    elif feed['bozo'] == True:
+        raise ValueError('The provided link is invalid or network problem occured')

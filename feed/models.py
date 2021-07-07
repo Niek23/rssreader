@@ -1,7 +1,9 @@
 from datetime import datetime  
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.timezone import make_aware
 from time import mktime
+from .services import is_valid_rss_feed
 
 
 
@@ -11,11 +13,7 @@ class FeedManager(models.Manager):
         
         import feedparser
         feed = feedparser.parse(link)
-
-        # Check is the provided link is a valid rss source
-        if feed['entries'] == []:
-            raise ValueError('The provided link does not have any rss entries or not valid')
-
+        is_valid_rss_feed(feed)
         feed_obj = self.create(title=feed['feed']['title'], subtitle=feed['feed']['subtitle'], link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
 
@@ -27,12 +25,14 @@ class FeedManager(models.Manager):
         # Parse the articles if they are not provided
         if articles is None:
             import feedparser
-            articles = feedparser.parse(feed.link)['entries']
+            parsed_feed = feedparser.parse(feed.link)
+            is_valid_rss_feed(parsed_feed)
+            articles = parsed_feed['entries']
         
         articles_obj = []
         for article in articles:
             # Create new articles if do not exist
-            date_time_created = datetime.fromtimestamp(mktime(article['published_parsed']))
+            date_time_created = make_aware(datetime.fromtimestamp(mktime(article['published_parsed'])))
             article_obj, created = Article.objects.get_or_create(title=article['title'], 
                                                                 feed=feed, 
                                                                 created=date_time_created)
@@ -57,7 +57,7 @@ class Feed(models.Model):
 class Article(models.Model):
     """Article is a peace of news from a feed"""
 
-    title = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200)
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
     created = models.DateTimeField(default=datetime.now, blank=True)
     is_read_by = models.ManyToManyField(User, blank=True)
