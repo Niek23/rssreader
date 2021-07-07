@@ -4,8 +4,8 @@ import signal
 from apscheduler.schedulers.blocking import BlockingScheduler
 from django.core.management.base import BaseCommand
 
-from feed.scheduler import JOBS
-import feed.tasks  # noqa Need to import this to process the decorators
+from task_scheduler.scheduler import JOBS
+import task_scheduler.tasks  # Need to import this to process the decorators
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.INFO)

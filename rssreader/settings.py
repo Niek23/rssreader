@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users', 
     'feed',
-    'djoser'
+    'djoser',
+    'task_scheduler'
 ]
 
 MIDDLEWARE = [

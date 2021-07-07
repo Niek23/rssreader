@@ -5,7 +5,8 @@ from feed.models import Feed
 
 @cron("* * * * *")
 @dramatiq.actor
-def idempotent_method():
+def update_feeds():
+    """Updates articles for all stored feeds"""
     feeds = Feed.objects.all()
     for feed in feeds:
         new_entires = Feed.objects.update_feed_content(feed)

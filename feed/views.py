@@ -1,11 +1,9 @@
-from urllib import request
 from django.contrib.auth.models import User
-from django.utils import decorators
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response 
 from .serializers import FeedSerializer, ArticleSerializer
-from .services import subscribe_to_feed, mark_article_read
+from .services import subscribe_to_feed, mark_article_read, filter_read
 from .models import Feed, Article
 
 
@@ -30,7 +28,7 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
     def update_articles(self, request, pk=None):
         """Feed endpoint to load new articles"""
         new_articles = Feed.objects.update_feed_content(self.get_object())
-        return Response({'message':'Succesfully updated', 'new_enries' :ArticleSerializer(new_articles, many=True).data})
+        return Response({'new_enries': ArticleSerializer(new_articles, many=True).data})
 
 
 class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
@@ -51,13 +49,11 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ArticleSerializer
     
     def get_queryset(self):
+        # Filter per feed and read/unread based on read paramenter in url
         read = self.request.query_params.get('read')
-        if read is not None:
-            if read == 'true':
-                return super().get_queryset().filter(is_read_by__id=self.request.user.id)
-            elif read == 'false':
-                return super().get_queryset().exclude(is_read_by__id=self.request.user.id)
-        return super().get_queryset()
+        qs = super().get_queryset().filter(feed=self.kwargs['feed_pk'])
+        return filter_read(qs, read, self.request)
+        
     @action(methods=['get'], detail=True, url_path='mark-read')
     def mark_read(self, request, pk=None, feed_pk=None):
         """Endpoint to mark an article as read"""
@@ -68,12 +64,6 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
         """Endpoint to unmark an article as read"""
         return mark_article_read(request.user, self.get_object(), mark=False)
 
-class NestedArticleViewSet(ArticleViewSet):
-    """  """
-    # Get articles for only selected feed
-    def get_queryset(self):
-        return super().get_queryset().filter(feed=self.kwargs['feed_pk'])
-    serializer_class = ArticleSerializer
 
 
 

@@ -37,3 +37,12 @@ def mark_article_read(user, article, mark=True):
 
         article.is_read_by.remove(user)
         return Response({'message': f'You have successfully marked the article * {article} * UNREAD'})
+
+def filter_read(query_set, read, request):
+    """Check if read=(true/false) paramter is in url, filter and return queryset"""
+    if read is not None:
+        if read == 'true':
+            return query_set.filter(is_read_by__id=request.user.id)
+        elif read == 'false':
+            return query_set.exclude(is_read_by__id=request.user.id)
+    return query_set    
