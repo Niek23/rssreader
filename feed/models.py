@@ -13,8 +13,8 @@ class FeedManager(models.Manager):
         """Create a new feed from a link and update this feed articles"""
 
         feed = get_valid_feed(link)
-        feed_obj = self.create(title=feed['feed']['title'],
-                               subtitle=feed['feed']['subtitle'],
+        feed_obj = self.create(title=feed['feed'].get('title', 'No title'),
+                               subtitle=feed['feed'].get('subtitle', 'No subtitle'),
                                link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
         return feed_obj

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 import feedparser
 
+
 def subscribe_to_feed(user, feed, subsrcibe=True):
     """(Un)Subscribe a user from/to feed and generate response"""
 
@@ -18,7 +19,6 @@ def subscribe_to_feed(user, feed, subsrcibe=True):
 
         feed.subscribers.remove(user)
         return Response({'message': f'You have successfully unsubscribed from * {feed} * feed'})
-
 
 def mark_article_read(user, article, mark=True):
     """(Un)Mark article as read for a user and generate response"""
@@ -43,9 +43,9 @@ def filter_read(query_set, read, request):
     """Check if read=(true/false) paramter is in url, filter and return queryset"""
 
     if read is not None:
-        if read == 'true':
+        if read == 'True':
             return query_set.filter(is_read_by__id=request.user.id)
-        if read == 'false':
+        if read == 'False':
             return query_set.exclude(is_read_by__id=request.user.id)
     return query_set
 
@@ -53,10 +53,6 @@ def get_valid_feed(link):
     """Check is the provided feed is a valid and return it"""
 
     feed = feedparser.parse(link)
-
-    if feed['bozo'] == 1:
-        raise ValueError('The provided link is not rss')
     if feed['bozo'] is True:
-        raise ValueError('The provided link is invalid or network problem occured')
-    
+        raise feed['bozo_exception']
     return feed
