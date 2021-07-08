@@ -20,10 +20,10 @@ def subscribe_to_feed(user, feed, subsrcibe=True):
         feed.subscribers.remove(user)
         return Response({'message': f'You have successfully unsubscribed from * {feed} * feed'})
 
-def mark_article_read(user, article, mark=True):
+def mark_article_read(user, article, is_read=True):
     """(Un)Mark article as read for a user and generate response"""
 
-    if mark:
+    if is_read:
         # Check if the article is already marked read
         if article.is_read_by.filter(pk = user.id).exists():
             return Response({'message':f'The article * {article} * is already marked READ'})
@@ -31,7 +31,7 @@ def mark_article_read(user, article, mark=True):
         article.is_read_by.add(user)
         return Response({'message': f'You have marked the article * {article} * READ'})
 
-    if not mark:
+    if not is_read:
         # Check if the article is not marked read
         if not article.is_read_by.filter(pk = user.id).exists():
             return Response({'message':f'The article * {article} * is already marked UNREAD'})

@@ -39,8 +39,6 @@ class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FeedSerializer
 
 
-
-
 class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
 
@@ -49,7 +47,7 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # Filter per feed and read/unread based on read paramenter in url
-        read = self.request.query_params.get('read')
+        read = self.request.query_params.get('read') #URLparam - read=True/False
         feed_pk = self.kwargs.get('feed_pk')
         qs = super().get_queryset()
         if feed_pk:
@@ -59,9 +57,13 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     @action(methods=['get'], detail=True, url_path='mark-read')
     def mark_read(self, request, pk=None, feed_pk=None):
         """Endpoint to mark an article as read"""
-        return mark_article_read(request.user, self.get_object())
+        user = request.user
+        article = self.get_object()
+        return mark_article_read(user, article)
 
     @action(methods=['get'], detail=True, url_path='unmark-read')
     def unmark_read(self, request, pk=None, feed_pk=None):
         """Endpoint to unmark an article as read"""
-        return mark_article_read(request.user, self.get_object(), mark=False)
+        user = request.user
+        article = self.get_object()
+        return mark_article_read(user, article, is_read=False)

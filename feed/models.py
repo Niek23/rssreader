@@ -2,7 +2,8 @@ from datetime import datetime
 from time import mktime
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.timezone import make_aware
+from django.utils.timezone import make_aware, now
+
 from .services import get_valid_feed
 
 
@@ -13,7 +14,7 @@ class FeedManager(models.Manager):
         """Create a new feed from a link and update this feed articles"""
 
         feed = get_valid_feed(link)
-        feed_obj = self.create(title=feed['feed'].get('title', 'No title'),
+        feed_obj, _ = self.get_or_create(title=feed['feed'].get('title', 'No title'),
                                subtitle=feed['feed'].get('subtitle', 'No subtitle'),
                                link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
@@ -29,7 +30,8 @@ class FeedManager(models.Manager):
 
         articles_obj = []
         for article in articles:
-            dt_created = make_aware(datetime.fromtimestamp(mktime(article['published_parsed'])))
+            struct = article['published_parsed']
+            dt_created = make_aware(datetime.fromtimestamp(mktime(struct)))
             # Create new articles if does not exist
             article_obj, created = Article.objects.get_or_create(title=article['title'],
                                                                  feed=feed,
@@ -57,7 +59,7 @@ class Article(models.Model):
 
     title = models.CharField(max_length=200)
     feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
-    created = models.DateTimeField(default=datetime.now, blank=True)
+    created = models.DateTimeField(default=now, blank=False)
     is_read_by = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
