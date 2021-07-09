@@ -6,8 +6,37 @@ from .services import subscribe_to_feed, mark_article_read, filter_read
 from .models import Feed, Article
 
 
+class WarningViewSet(viewsets.ReadOnlyModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        feed_pk = self.kwargs.get('feed_pk')
+        if feed_pk:
+            status = Feed.objects.filter(pk=feed_pk).first().updating
+        else:
+            status = 'Consult auto-update status per feed'
+        response = {'AUTO-UPDATE': status, 
+                    'data': serializer.data}
+        return Response(response)
 
-class FeedViewSet(viewsets.ReadOnlyModelViewSet):
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        response = {'AUTO-UPDATE': 'Consult auto-update status per feed', 
+                    'data': serializer.data}
+        return Response(response)
+
+
+
+
+class FeedViewSet(WarningViewSet):
     """Feeds endpoint to get one or all feeds and (un)subscribe to the selected one"""
 
     queryset = Feed.objects.all()
@@ -23,14 +52,21 @@ class FeedViewSet(viewsets.ReadOnlyModelViewSet):
         """Feed endpoint to unsubscribe the user from the feed"""
         return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
 
-    @action(methods=['get'], detail=True, url_path='update-articles')
-    def update_articles(self, request, pk=None):
+    @action(methods=['get'], detail=True, url_path='force-update')
+    def force_update(self, request, pk=None):
         """Feed endpoint to load new articles"""
         new_articles = Feed.objects.update_feed_content(self.get_object())
-        return Response({'new_enries': ArticleSerializer(new_articles, many=True).data})
+        return Response({'new_entries': ArticleSerializer(new_articles, many=True).data})
+
+    @action(methods=['get'], detail=True, url_path='retry-updates')
+    def retry_updates(self, request, pk=None):
+        feed = self.get_object()
+        feed.updating = True
+        feed.save()
+        return Response({'AUTO-UPDATE': 'restarting', 'feed': FeedSerializer(feed).data})
 
 
-class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
+class MyFeedViewSet(WarningViewSet):
     """ Feeds endpoint to get a list of feeds a user subcribed to"""
 
     queryset = Feed.objects.all()
@@ -39,9 +75,9 @@ class MyFeedViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FeedSerializer
 
 
-class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
+class ArticleViewSet(WarningViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
-
+        
     queryset = Article.objects.all().order_by('-created')
     serializer_class = ArticleSerializer
 

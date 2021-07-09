@@ -7,8 +7,6 @@ from django.utils.timezone import make_aware, now
 from .services import get_valid_feed
 
 
-
-
 class FeedManager(models.Manager):
     def create_feed(self, link):
         """Create a new feed from a link and update this feed articles"""
@@ -48,6 +46,7 @@ class Feed(models.Model):
     subtitle = models.CharField(max_length=150, default='No subtitle')
     link = models.URLField(max_length=200, unique=True)
     subscribers = models.ManyToManyField(User, blank=True)
+    updating = models.BooleanField(default=True)
 
     objects = FeedManager()
 

@@ -1,4 +1,5 @@
 import pytest
+from feed.models import Feed
 
 
 class TestFeedAPI:
@@ -57,3 +58,25 @@ class TestFeedAPI:
         
         assert feed.subscribers.all().count() == 0, \
             f'Route /api/feeds/<feed_id>/unsubscribe/ subscribed user for the feed'
+    
+
+    @pytest.mark.django_db(transaction=True)
+    def test_update_articles(self, user_client, feed):
+        response = user_client.get(f'/api/feeds/{feed.id}/force-update/')
+        assert 'new_entries' in response.json(), \
+            'Make sure `/api/feeds/<feed.id>/update-articles/` updates articles and returns them'
+
+
+    @pytest.mark.django_db(transaction=True)
+    def test_create_feed_method(self):
+        feed = Feed.objects.create_feed('https://feeds.feedburner.com/tweakers/mixed')
+        assert feed.article_set.all().count() > 0
+
+
+    @pytest.mark.django_db(transaction=True)
+    def test_update_feed_content(self):
+        feed = Feed.objects.create_feed('https://feeds.feedburner.com/tweakers/mixed')
+        feed.article_set.all().delete()
+        assert feed.article_set.all().count() == 0
+        Feed.objects.update_feed_content(feed)
+        assert feed.article_set.all().count() > 0
