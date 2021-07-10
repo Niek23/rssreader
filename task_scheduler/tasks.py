@@ -1,4 +1,3 @@
-from urllib.error import URLError
 import dramatiq
 from feed.models import Feed
 from .scheduler import cron
@@ -19,7 +18,7 @@ def on_failure(message, error):
 
 @dramatiq.actor(max_retries=3)
 def update_feed(feed_id):
-    """Update one feed with 3 retries"""
+    """Update one feed with 3 retries if fails"""
     feed = Feed.objects.get(id=feed_id)
     print(f'* {feed.title} * Auto-updating status - {feed.updating}')
     if not feed.updating:

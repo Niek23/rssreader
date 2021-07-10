@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import FeedSerializer, ArticleSerializer
-from .services import subscribe_to_feed, mark_article_read, filter_read
+from .services import subscribe_to_feed, mark_article_read, filter_read, get_updating_status
 from .models import Feed, Article
 
 
@@ -11,11 +11,8 @@ class WarningViewSet(viewsets.ReadOnlyModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         feed_pk = self.kwargs.get('feed_pk')
-        if feed_pk:
-            status = Feed.objects.filter(pk=feed_pk).first().updating
-        else:
-            status = 'Consult auto-update status per feed'
-        response = {'AUTO-UPDATE': status, 
+        status = get_updating_status(Feed, feed_pk)
+        response = {'auto-update': status, 
                     'data': serializer.data}
         return Response(response)
 
@@ -28,12 +25,10 @@ class WarningViewSet(viewsets.ReadOnlyModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-
-        response = {'AUTO-UPDATE': 'Consult auto-update status per feed', 
+        status = get_updating_status(Feed)
+        response = {'auto-update': status, 
                     'data': serializer.data}
         return Response(response)
-
-
 
 
 class FeedViewSet(WarningViewSet):
@@ -63,7 +58,7 @@ class FeedViewSet(WarningViewSet):
         feed = self.get_object()
         feed.updating = True
         feed.save()
-        return Response({'AUTO-UPDATE': 'restarting', 'feed': FeedSerializer(feed).data})
+        return Response({'auto-update': 'restarting', 'feed': FeedSerializer(feed).data})
 
 
 class MyFeedViewSet(WarningViewSet):
@@ -87,7 +82,7 @@ class ArticleViewSet(WarningViewSet):
         feed_pk = self.kwargs.get('feed_pk')
         qs = super().get_queryset()
         if feed_pk:
-            qs = super().get_queryset().filter(feed=self.kwargs['feed_pk'])
+            qs = qs.filter(feed=self.kwargs['feed_pk'])
         return filter_read(qs, read, self.request)
 
     @action(methods=['get'], detail=True, url_path='mark-read')

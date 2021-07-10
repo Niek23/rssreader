@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 import feedparser
-
+from django.shortcuts import get_object_or_404
 
 def subscribe_to_feed(user, feed, subsrcibe=True):
     """(Un)Subscribe a user from/to feed and generate response"""
@@ -53,6 +53,21 @@ def get_valid_feed(link):
     """Check is the provided feed is a valid and return it"""
 
     feed = feedparser.parse(link)
-    if feed['bozo'] is True:
+    if feed['bozo'] == 1:
         raise feed['bozo_exception']
     return feed
+
+def get_updating_status(Feed, feed_pk=None):
+    """Return updating status based on the number of udpating feeds"""
+    if feed_pk:
+        status = get_object_or_404(Feed, pk=feed_pk).updating
+    else:
+        not_updating = Feed.objects.filter(updating=False).count()
+        if not not_updating:    
+            status = 'All feeds are updating every minute'
+        else:
+            if not_updating == 1:
+                status = '1 feed is not updating'
+            else:
+                status = f'{not_updating} feeds are not updating'
+    return status

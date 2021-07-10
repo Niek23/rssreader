@@ -27,6 +27,7 @@ services:
         condition: service_healthy
     links:
       - db
+    command: bash ./entrypoint.sh
     networks: 
         - net1
   rabbitmq:
