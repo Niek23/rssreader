@@ -46,9 +46,9 @@ def filter_read(query_set, read, request):
     """Check if read=(true/false) paramter is in url, filter and return queryset"""
 
     if read is not None:
-        if read == 'True':
+        if read == 'true':
             return query_set.filter(is_read_by__id=request.user.id)
-        if read == 'False':
+        if read == 'false':
             return query_set.exclude(is_read_by__id=request.user.id)
     return query_set
 
