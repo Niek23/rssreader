@@ -37,7 +37,7 @@ services:
     command: python manage.py rundramatiq
     depends_on: 
         - rabbitmq
-        - app
+        - web
     networks: 
         - net1
   scheduler:
