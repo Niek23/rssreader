@@ -12,7 +12,7 @@ class WarningViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(instance)
         feed_pk = self.kwargs.get('feed_pk')
         status = get_updating_status(Feed, feed_pk)
-        response = {'auto-update': status, 
+        response = {'auto-update': status,
                     'data': serializer.data}
         return Response(response)
 
@@ -26,7 +26,7 @@ class WarningViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         status = get_updating_status(Feed)
-        response = {'auto-update': status, 
+        response = {'auto-update': status,
                     'data': serializer.data}
         return Response(response)
 
@@ -65,6 +65,7 @@ class MyFeedViewSet(WarningViewSet):
     """ Feeds endpoint to get a list of feeds a user subcribed to"""
 
     queryset = Feed.objects.all()
+
     def get_queryset(self):
         return super().get_queryset().filter(subscribers__id=self.request.user.id)
     serializer_class = FeedSerializer
@@ -72,13 +73,14 @@ class MyFeedViewSet(WarningViewSet):
 
 class ArticleViewSet(WarningViewSet):
     """ Article endpoint to get one or all artcles for the selected feed"""
-        
+
     queryset = Article.objects.all().order_by('-created')
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
         # Filter per feed and read/unread based on read paramenter in url
-        read = self.request.query_params.get('read') #URLparam - read=True/False
+        read = self.request.query_params.get(
+            'read')  # URLparam - read=True/False
         feed_pk = self.kwargs.get('feed_pk')
         qs = super().get_queryset()
         if feed_pk:

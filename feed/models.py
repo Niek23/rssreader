@@ -13,8 +13,9 @@ class FeedManager(models.Manager):
 
         feed = get_valid_feed(link)
         feed_obj, _ = self.get_or_create(title=feed['feed'].get('title', 'No title'),
-                               subtitle=feed['feed'].get('subtitle', 'No subtitle'),
-                               link=link)
+                                         subtitle=feed['feed'].get(
+                                             'subtitle', 'No subtitle'),
+                                         link=link)
         self.update_feed_content(feed_obj, articles=feed['entries'])
         return feed_obj
 
@@ -36,7 +37,7 @@ class FeedManager(models.Manager):
                                                                  created=dt_created)
             if created:
                 articles_obj.append(article_obj)
-        return articles_obj # Return new articles
+        return articles_obj  # Return new articles
 
 
 class Feed(models.Model):
@@ -53,6 +54,7 @@ class Feed(models.Model):
     def __str__(self):
         return self.title
 
+
 class Article(models.Model):
     """Article is a peace of news from a feed"""
 
@@ -63,4 +65,3 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-        

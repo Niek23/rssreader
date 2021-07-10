@@ -9,11 +9,15 @@ router.register(r'feeds', FeedViewSet, basename='feeds')
 router.register(r'my-feeds', MyFeedViewSet, basename='my-feeds')
 router.register(r'articles', ArticleViewSet, basename='articles')
 
-feeds_articles_router = routers.NestedSimpleRouter(router, r'feeds', lookup='feed')
-myfeeds_articles_router = routers.NestedSimpleRouter(router, r'my-feeds', lookup='feed')
+feeds_articles_router = routers.NestedSimpleRouter(
+    router, r'feeds', lookup='feed')
+myfeeds_articles_router = routers.NestedSimpleRouter(
+    router, r'my-feeds', lookup='feed')
 
-feeds_articles_router.register(r'articles', ArticleViewSet, basename='feed-article')
-myfeeds_articles_router.register(r'articles', ArticleViewSet, basename='myfeed-article')
+feeds_articles_router.register(
+    r'articles', ArticleViewSet, basename='feed-article')
+myfeeds_articles_router.register(
+    r'articles', ArticleViewSet, basename='myfeed-article')
 
 urlpatterns = [
 

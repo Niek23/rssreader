@@ -25,7 +25,8 @@ def update_feed(feed_id):
         return
 
     new_entires = Feed.objects.update_feed_content(feed)
-    print(f'Feed * {feed.title} * has been updated with {len(new_entires)} new entries')
+    print(
+        f'Feed * {feed.title} * has been updated with {len(new_entires)} new entries')
 
 
 @cron('* * * * *')

@@ -5,15 +5,15 @@ from drf_yasg import openapi
 from rest_framework import permissions
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="RSS Reader API",
-      default_version='v1',
-      description="RSS Reader provides the possiblity to subscribe for various feeds,\
+    openapi.Info(
+        title="RSS Reader API",
+        default_version='v1',
+        description="RSS Reader provides the possiblity to subscribe for various feeds,\
                   mark articles and filter them.",
-      contact=openapi.Contact(email="nkt.gonchar@gmail.com"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+        contact=openapi.Contact(email="nkt.gonchar@gmail.com"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
@@ -22,5 +22,6 @@ urlpatterns = [
     path(r'api/', include('feed.urls')),
 
     # Documentation
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0),
+         name='schema-swagger-ui'),
 ]

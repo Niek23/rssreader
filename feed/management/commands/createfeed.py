@@ -2,6 +2,7 @@ from urllib.error import URLError
 from django.core.management.base import BaseCommand, CommandError
 from feed.models import Feed
 
+
 class Command(BaseCommand):
     help = 'Creates new feed and loads new articles'
 
@@ -13,6 +14,8 @@ class Command(BaseCommand):
             try:
                 feed = Feed.objects.create_feed(link)
             except URLError:
-                raise CommandError(f'Link * {link} * is not valid rss source or network problem occured')
+                raise CommandError(
+                    f'Link * {link} * is not valid rss source or network problem occured')
 
-            self.stdout.write(self.style.SUCCESS(f'Successfully created feed * {feed.title} * '))
+            self.stdout.write(self.style.SUCCESS(
+                f'Successfully created feed * {feed.title} * '))

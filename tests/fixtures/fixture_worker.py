@@ -10,6 +10,7 @@ def broker():
     broker.flush_all()
     return broker
 
+
 @pytest.fixture
 def worker(broker):
     worker = dramatiq.worker.Worker(broker, worker_timeout=100)
@@ -17,7 +18,9 @@ def worker(broker):
     yield worker
     worker.stop()
 
+
 @pytest.fixture()
 def empty_feed():
-    feed = Feed.objects.create(link="http://www.nu.nl/rss/Algemeen", title="nu.nl")
+    feed = Feed.objects.create(
+        link="http://www.nu.nl/rss/Algemeen", title="nu.nl")
     return feed
