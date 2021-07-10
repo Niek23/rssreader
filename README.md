@@ -27,4 +27,4 @@ Make sure you have you have Python 3.6+ installed on your machine. ```mv rssread
 Go to ```http://127.0.0.1:8000``` in your browser to see the app running. The first page gives the OpenAPI overview of all routes. Use ```?read=true/false``` to filter  read/unread articles. Within the docker setup you can login using admin/admin credentials. For the local run use the credentials specifed on the 4th setup step. 
 
 ## Testing
-Pytest is used for all project tests. Run ```pytest``` within the project directory to start all tests. Provide directory or specific file after the command to choose which tests to run. **Keep in mind the last test file runs for 1-2 min due to task retires.**
+Pytest is used for all project tests. Run ```pytest``` within the project directory to start all tests. Provide directory or specific file after the command to choose which tests to run. **Keep in mind the last test file runs for 1-2 min due to task retries.**
