@@ -44,7 +44,7 @@ class TestArticleAPI:
         response = user_client.get(
             f'/api/my-feeds/{feed.id}/articles/?read=false')
         assert len(response.json().get('data')) + 1 == feed.article_set.all().count(), \
-            'Route `/api/my-feeds/{feed.id}/articles/?read=False` does not filter unread articles'
+            'Route `/api/my-feeds/{feed.id}/articles/?read=false` does not filter unread articles'
 
         response = user_client.get(
             f'/api/my-feeds/{feed.id}/articles/?read=true')
@@ -58,7 +58,7 @@ class TestArticleAPI:
             [user])  # mark one article read
 
         response = user_client.get(
-            f'/api/feeds/{feed.id}/articles/?read=False')
+            f'/api/feeds/{feed.id}/articles/?read=false')
         assert len(response.json().get('data')) + 1 == feed.article_set.all().count(), \
             'Route `/api/feeds/{feed.id}/articles/?read=false` does not filter unread articles'
 
