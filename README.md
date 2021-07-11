@@ -12,8 +12,8 @@ The recommended method to run the project is using by using Docker. Make sure [D
 
 
 #### Locally
-Make sure you have you have Python 3.6+ installed on your machine. ```mv rssreader/.env.example.local rssreader/.env```
-1. Follow the 1st step from the Docker setup and get .env file ready.
+Make sure you have you have Python 3.6+ installed on your machine. 
+1. Follow the 1st step from the Docker setup and get .env file ready. ```mv rssreader/.env.example.local rssreader/.env```
 2. Run ```pip install -r requirements.txt``` to install python packages for the app. Don't forget to set up python virtual environment.  
 3. Run migrations by ```python manage.py migrate```
 4. To create superuser use the following command ```python manage.py createsuperuser```. It will be necessary to log in before accessing any resource. 
