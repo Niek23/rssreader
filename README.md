@@ -6,7 +6,7 @@ RSS Reader provides the possibility to subscribe for various feeds, mark article
 ## Getting Started
 ### Prerequisites
 #### Docker
-The recommended method to run the project is using by using Docker. Make sure [Docker](https://www.docker.com/products/docker-desktop) is installed and running on your machine.
+The recommended method to run the project is by using Docker. Make sure [Docker](https://www.docker.com/products/docker-desktop) is installed and running on your machine.
 1. Run ```mv rssreader/.env.example.docker rssreader/.env``` to rename the file with environment variables needed to start the app. Open with any text editor and fill in all fields (no space after =).
 2. Run the following command: ```docker-compose up```. It will create and start all necessary containers for running the application. 
 
