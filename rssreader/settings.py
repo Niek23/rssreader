@@ -123,7 +123,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -171,3 +171,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/auth/token/login'
+LOGOUT_URL = '/auth/token/logout'
+
+
+DJOSER = {
+    'CREATE_SESSION_ON_LOGIN': True,
+}
