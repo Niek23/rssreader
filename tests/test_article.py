@@ -72,7 +72,7 @@ class TestArticleAPI:
         # Try mark already read article
         count_before = len(user_client.get(
             f'/api/feeds/{feed.id}/articles/?read=true').json().get('data'))
-        response = user_client.get(
+        response = user_client.post(
             f'/api/feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'The article * {article.title} * is already marked READ'
@@ -82,8 +82,8 @@ class TestArticleAPI:
 
         # Try unmark one article
         count_before = count_after
-        response = user_client.get(
-            f'/api/feeds/{feed.id}/articles/{article.id}/unmark-read/')
+        response = user_client.delete(
+            f'/api/feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'You have marked the article * {article.title} * UNREAD'
         count_after = len(user_client.get(
@@ -92,8 +92,8 @@ class TestArticleAPI:
 
         # Try unmark not read article
         count_before = count_after
-        response = user_client.get(
-            f'/api/feeds/{feed.id}/articles/{article.id}/unmark-read/')
+        response = user_client.delete(
+            f'/api/feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'The article * {article.title} * is already marked UNREAD'
         count_after = len(user_client.get(
@@ -102,7 +102,7 @@ class TestArticleAPI:
 
         # Try mark article read
         count_before = count_after
-        response = user_client.get(
+        response = user_client.post(
             f'/api/feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'You have marked the article * {article.title} * READ'
@@ -116,7 +116,7 @@ class TestArticleAPI:
         # Try mark already read article
         count_before = len(user_client.get(
             f'/api/my-feeds/{feed.id}/articles/?read=true').json().get('data'))
-        response = user_client.get(
+        response = user_client.post(
             f'/api/my-feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'The article * {article.title} * is already marked READ'
@@ -126,8 +126,8 @@ class TestArticleAPI:
 
         # Try unmark one article
         count_before = count_after
-        response = user_client.get(
-            f'/api/my-feeds/{feed.id}/articles/{article.id}/unmark-read/')
+        response = user_client.delete(
+            f'/api/my-feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'You have marked the article * {article.title} * UNREAD'
         count_after = len(user_client.get(
@@ -136,8 +136,8 @@ class TestArticleAPI:
 
         # Try unmark not read article
         count_before = count_after
-        response = user_client.get(
-            f'/api/my-feeds/{feed.id}/articles/{article.id}/unmark-read/')
+        response = user_client.delete(
+            f'/api/my-feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'The article * {article.title} * is already marked UNREAD'
         count_after = len(user_client.get(
@@ -146,7 +146,7 @@ class TestArticleAPI:
 
         # Try mark article read
         count_before = count_after
-        response = user_client.get(
+        response = user_client.post(
             f'/api/my-feeds/{feed.id}/articles/{article.id}/mark-read/')
         assert response.json().get('message') == \
             f'You have marked the article * {article.title} * READ'

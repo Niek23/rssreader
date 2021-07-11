@@ -46,7 +46,7 @@ class TestUpdateFeeds:
         assert not Feed.objects.all().first().updating, \
             'The False status should not be toggled after task execution'
 
-        user_client.get(f'/api/feeds/{empty_feed.id}/retry-updates/')
+        user_client.post(f'/api/feeds/{empty_feed.id}/retry-updates/')
 
         assert Feed.objects.all().first().updating, \
             '/retry-update/ does not make updating True for the requested feed'

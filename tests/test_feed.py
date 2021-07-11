@@ -34,21 +34,21 @@ class TestFeedAPI:
         assert feed.subscribers.all().count() == 1, \
             f'Check fixture data. There should be 1 subscriber for {feed.title}'
 
-        response = user_client.get(f'/api/feeds/{feed.id}/subscribe/')
+        response = user_client.post(f'/api/feeds/{feed.id}/subscribe/')
         assert response.json().get('message') == \
             f'You are already subscribed to * {feed.title} * feed'
 
         assert feed.subscribers.all().count() == 1, \
             f'Route /api/feeds/<feed_id>/subscribe/ unsubscribed user from the feed'
 
-        response = user_client.get(f'/api/feeds/{feed.id}/unsubscribe/')
+        response = user_client.delete(f'/api/feeds/{feed.id}/subscribe/')
         assert response.json().get('message') == \
             f'You have successfully unsubscribed from * {feed.title} * feed'
 
         assert feed.subscribers.all().count() == 0, \
             f'Route /api/feeds/<feed_id>/unsubscribe/ does not work'
 
-        response = user_client.get(f'/api/feeds/{feed.id}/unsubscribe/')
+        response = user_client.delete(f'/api/feeds/{feed.id}/subscribe/')
         assert response.json().get('message') == \
             f'You are not subscribed to * {feed.title} * feed'
 
@@ -57,7 +57,7 @@ class TestFeedAPI:
 
     @pytest.mark.django_db(transaction=True)
     def test_update_articles(self, user_client, feed):
-        response = user_client.get(f'/api/feeds/{feed.id}/force-update/')
+        response = user_client.post(f'/api/feeds/{feed.id}/force-update/')
         assert 'new_entries' in response.json(), \
             'Make sure `/api/feeds/<feed.id>/update-articles/` updates articles and returns them'
 

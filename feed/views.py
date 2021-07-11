@@ -37,23 +37,21 @@ class FeedViewSet(WarningViewSet):
     queryset = Feed.objects.all()
     serializer_class = FeedSerializer
 
-    @action(methods=['get'], detail=True, url_path='subscribe')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='subscribe')
     def subscribe(self, request, pk=None):
-        """Feed endpoint to subscribe the user to the feed"""
-        return subscribe_to_feed(request.user, self.get_object())
+        """Feed endpoint to (un)subscribe the user from/to the feed"""
+        if request.method == 'POST':
+            return subscribe_to_feed(request.user, self.get_object())
+        if request.method == 'DELETE':
+            return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
 
-    @action(methods=['get'], detail=True, url_path='unsubscribe')
-    def unsubscribe(self, request, pk=None):
-        """Feed endpoint to unsubscribe the user from the feed"""
-        return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
-
-    @action(methods=['get'], detail=True, url_path='force-update')
+    @action(methods=['POST'], detail=True, url_path='force-update')
     def force_update(self, request, pk=None):
         """Feed endpoint to load new articles"""
         new_articles = Feed.objects.update_feed_content(self.get_object())
         return Response({'new_entries': ArticleSerializer(new_articles, many=True).data})
 
-    @action(methods=['get'], detail=True, url_path='retry-updates')
+    @action(methods=['POST'], detail=True, url_path='retry-updates')
     def retry_updates(self, request, pk=None):
         feed = self.get_object()
         feed.updating = True
@@ -87,16 +85,12 @@ class ArticleViewSet(WarningViewSet):
             qs = qs.filter(feed=self.kwargs['feed_pk'])
         return filter_read(qs, read, self.request)
 
-    @action(methods=['get'], detail=True, url_path='mark-read')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='mark-read')
     def mark_read(self, request, pk=None, feed_pk=None):
-        """Endpoint to mark an article as read"""
+        """Endpoint to (un)mark an article as read"""
         user = request.user
         article = self.get_object()
-        return mark_article_read(user, article)
-
-    @action(methods=['get'], detail=True, url_path='unmark-read')
-    def unmark_read(self, request, pk=None, feed_pk=None):
-        """Endpoint to unmark an article as read"""
-        user = request.user
-        article = self.get_object()
-        return mark_article_read(user, article, is_read=False)
+        if request.method == 'POST':
+            return mark_article_read(user, article)
+        if request.method == 'DELETE':
+            return mark_article_read(user, article, is_read=False)
