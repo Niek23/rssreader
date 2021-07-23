@@ -43,7 +43,7 @@ class FeedViewSet(WarningViewSet):
         if request.method == 'POST':
             return subscribe_to_feed(request.user, self.get_object())
         if request.method == 'DELETE':
-            return subscribe_to_feed(request.user, self.get_object(), subsrcibe=False)
+            return subscribe_to_feed(request.user, self.get_object(), subscribe=False)
 
     @action(methods=['POST'], detail=True, url_path='force-update')
     def force_update(self, request, pk=None):
