@@ -3,18 +3,18 @@ import feedparser
 from django.shortcuts import get_object_or_404
 
 
-def subscribe_to_feed(user, feed, subsrcibe=True):
+def subscribe_to_feed(user, feed, subscribe=True):
     """(Un)Subscribe a user from/to feed and generate response"""
 
-    # Check if the user is already subcribed to the feed
-    if subsrcibe:
+    # Check if the user is already subscribed to the feed
+    if subscribe:
         if feed.subscribers.filter(pk=user.id).exists():
             return Response({'message': f'You are already subscribed to * {feed} * feed'})
 
         feed.subscribers.add(user)
         return Response({'message': f'You have successfully subscribed to * {feed} * feed'})
 
-    if not subsrcibe:
+    if not subscribe:
         if not feed.subscribers.filter(pk=user.id).exists():
             return Response({'message': f'You are not subscribed to * {feed} * feed'})
 
@@ -43,7 +43,7 @@ def mark_article_read(user, article, is_read=True):
 
 
 def filter_read(query_set, read, request):
-    """Check if read=(true/false) paramter is in url, filter and return queryset"""
+    """Check if read=(true/false) parameter is in url, filter and return queryset"""
 
     if read is not None:
         if read == 'true':
@@ -62,13 +62,13 @@ def get_valid_feed(link):
     return feed
 
 
-def get_updating_status(Feed, feed_pk=None):
-    """Return updating status based on the number of udpating feeds"""
+def get_updating_status(feed_model, feed_pk=None):
+    """Return updating status based on the number of updating feeds"""
 
     if feed_pk:
-        status = get_object_or_404(Feed, pk=feed_pk).updating
+        status = get_object_or_404(feed_model, pk=feed_pk).updating
     else:
-        not_updating = Feed.objects.filter(updating=False).count()
+        not_updating = feed_model.objects.filter(updating=False).count()
         if not not_updating:
             status = 'All feeds are updating every minute'
         else:

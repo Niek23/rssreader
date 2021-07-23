@@ -5,7 +5,7 @@ from .scheduler import cron
 
 @dramatiq.actor
 def on_failure(message, error):
-    """Updates auto-udpate status for feed if it triggered 3rd time"""
+    """Updates auto-update status for feed if it triggered 3rd time"""
     retries = message.get('options', {}).get('retries', 1)
     args = message.get('args')
     if args and retries >= 3:
@@ -13,7 +13,7 @@ def on_failure(message, error):
         feed = Feed.objects.get(id=feed_id)
         feed.updating = False
         feed.save()
-        print(f'Togling updating status for feed * {feed.title} * to False')
+        print(f'Toggling updating status for feed * {feed.title} * to False')
 
 
 @dramatiq.actor(max_retries=3)
@@ -24,9 +24,9 @@ def update_feed(feed_id):
     if not feed.updating:
         return
 
-    new_entires = Feed.objects.update_feed_content(feed)
+    new_entries = Feed.objects.update_feed_content(feed)
     print(
-        f'Feed * {feed.title} * has been updated with {len(new_entires)} new entries')
+        f'Feed * {feed.title} * has been updated with {len(new_entries)} new entries')
 
 
 @cron('* * * * *')
